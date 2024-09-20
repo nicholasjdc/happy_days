@@ -1,0 +1,9 @@
+# Godot 4+ specific ignores
+.godot/
+Movies/
+Audio/
+Models/
+Resources/
+*.ogg
+*.ogv
+*.glb

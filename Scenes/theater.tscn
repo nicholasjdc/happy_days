@@ -1,0 +1,92 @@
+[gd_scene load_steps=9 format=3 uid="uid://cxem62ypp2we"]
+
+[ext_resource type="PackedScene" uid="uid://7g2n276uxlgp" path="res://Scenes/Doorway.tscn" id="1_sxthm"]
+[ext_resource type="Script" path="res://Scenes/ScreenPlayer.gd" id="2_2m8fs"]
+[ext_resource type="PackedScene" uid="uid://ds6b0elkfmp48" path="res://Scenes/16mmCamera.tscn" id="3_2q7f3"]
+[ext_resource type="PackedScene" uid="uid://c7dfpqhbkkft7" path="res://Scenes/16_mm_film.tscn" id="5_gapfj"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_h30tx"]
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_jgopv"]
+viewport_path = NodePath("SubViewport")
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_uyhml"]
+viewport_path = NodePath("SubViewport")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_grcit"]
+resource_local_to_scene = true
+albedo_texture = SubResource("ViewportTexture_jgopv")
+emission_enabled = true
+emission_texture = SubResource("ViewportTexture_uyhml")
+
+[node name="Theater" type="Node3D"]
+
+[node name="Floor" type="CSGBox3D" parent="."]
+use_collision = true
+size = Vector3(30, 0.01, 30)
+
+[node name="Ceiling" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.2, 0)
+use_collision = true
+size = Vector3(26, 0.01, 26)
+
+[node name="Entrance" type="Node3D" parent="."]
+
+[node name="Doorway" parent="Entrance" instance=ExtResource("1_sxthm")]
+transform = Transform3D(3, 0, 0, 0, 3, 0, 0, 0, 3, -1.5, 0, 12.5)
+
+[node name="Side Walls" type="Node3D" parent="."]
+
+[node name="doorWallFront" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.791, 1.62, 12.416)
+use_collision = true
+size = Vector3(10.5, 5, 1)
+
+[node name="doorWallFront2" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.5, 1.6, 12.416)
+use_collision = true
+size = Vector3(10.5, 5, 1)
+
+[node name="backWall" type="CSGBox3D" parent="."]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 11.893, 1.5, 0)
+use_collision = true
+size = Vector3(24.918, 3.51454, 1)
+
+[node name="frontWall" type="CSGBox3D" parent="."]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -12, 1.5, 0)
+use_collision = true
+size = Vector3(24.918, 3.51454, 1)
+
+[node name="rightWall" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -12)
+use_collision = true
+size = Vector3(24.918, 3.51454, 1)
+
+[node name="SubViewport" type="SubViewport" parent="."]
+size = Vector2i(320, 240)
+
+[node name="SubViewportContainer" type="SubViewportContainer" parent="SubViewport"]
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="VideoStreamPlayer" type="VideoStreamPlayer" parent="SubViewport/SubViewportContainer"]
+layout_mode = 2
+script = ExtResource("2_2m8fs")
+
+[node name="Screen" type="MeshInstance3D" parent="."]
+transform = Transform3D(-4.37114e-08, -1, 0, -4.37114e-08, 1.91069e-15, -1, 1, -4.37114e-08, -4.37114e-08, 11.0182, 2.30636, -1.95496)
+mesh = SubResource("PlaneMesh_h30tx")
+surface_material_override/0 = SubResource("StandardMaterial3D_grcit")
+
+[node name="AudioStreamPlayer3D" type="AudioStreamPlayer3D" parent="Screen"]
+autoplay = true
+max_distance = 15.63
+
+[node name="16mmProjector" parent="." instance=ExtResource("3_2q7f3")]
+transform = Transform3D(0.03, 0, 0, 0, 0.03, 0, 0, 0, 0.03, 0, 1.48161, -2.06654)
+
+[node name="16mmFilm" parent="." instance=ExtResource("5_gapfj")]
+transform = Transform3D(0.05, 0, 0, 0, 0.05, 0, 0, 0, 0.05, -0.993106, 1.77959, 0)
+
+[connection signal="finished" from="SubViewport/SubViewportContainer/VideoStreamPlayer" to="16mmProjector" method="_on_video_stream_player_finished"]
+[connection signal="interacted" from="16mmProjector" to="SubViewport/SubViewportContainer/VideoStreamPlayer" method="_on_mm_projector_interacted"]
